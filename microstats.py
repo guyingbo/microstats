@@ -30,7 +30,7 @@ def get_stats(lst):
     total = sum(lst)
     length = len(lst)
     avg = total / length
-    p95 = math.ceil(length * 95 / 100) - 1
+    p95 = int(math.ceil(length * 95.0 / 100)) - 1
     p5 = length - p95 - 1
     return {
         'sum': total,
@@ -106,7 +106,8 @@ class MicroStats:
             elif isinstance(v, list):
                 for postfix, val in get_stats(v).items():
                     result['%s_%s' % (k, postfix)] = val
-                v.clear()
+                del v[:] # for python2
+                # v.clear() # for python3
         return result
 
     def flush(self):
