@@ -1,4 +1,6 @@
 # microstats
+[![Build Status](https://travis-ci.org/guyingbo/microstats.svg?branch=master)](https://travis-ci.org/guyingbo/microstats)
+
 A very simple in-memory statistics module.
 
 ## Installation
