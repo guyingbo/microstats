@@ -1,7 +1,7 @@
 import math
 import time
 from contextlib import contextmanager
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 class GaugeValue:
@@ -36,7 +36,9 @@ def get_stats(lst):
         'sum': total,
         'avg': avg,
         'max_p95': lst[p95],
-        'min_p95': lst[p5]
+        'min_p95': lst[p5],
+        'max': lst[-1],
+        'min': lst[0],
     }
 
 

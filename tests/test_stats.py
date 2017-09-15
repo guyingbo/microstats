@@ -25,13 +25,22 @@ def test_gauge_value():
 def test_get_stats():
     l = [0]
     d = microstats.get_stats(l)
-    assert d == {'sum': 0, 'avg': 0, 'max_p95': 0, 'min_p95': 0}
+    assert d == {
+        'sum': 0,
+        'avg': 0,
+        'max_p95': 0,
+        'min_p95': 0,
+        'max': 0,
+        'min': 0
+    }
     assert len(lst) == 20
     d = microstats.get_stats(lst)
     assert d['sum'] == 200.6
     assert d['avg'] == 10.03
     assert d['max_p95'] == 23
     assert d['min_p95'] == 3
+    assert d['max'] == 28
+    assert d['min'] == 2
 
 
 def test_micro_stats():
