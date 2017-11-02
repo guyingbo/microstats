@@ -1,9 +1,14 @@
 language: python
 python:
-    - 2.7
-    - 3.5
-    - 3.6
-
+- 2.7
+- 3.5
+- 3.6
 install: python setup.py install
-
 script: python setup.py test
+deploy:
+  provider: pypi
+  user: guyingbo
+  password:
+    secure: N5RGpI3z9rYvIrdLFxXtk07KdByMN7w39YZepB25Gy+H5bVc8VjrGGyO4eEcotbXn2qsSbc99pMfA/DtIm/JTMcDIVcQeYub+ieKbJNmynzIN3PZLIbCiPgCmZW+y293oKOIsiEjQYLcE3wBEMFzRtjSKoldci6BLHtCR59NXauGbmTmXMNtwzFwiIQ3EDq8ru3a96MOOo/sDlAhpzqKL5A9lhUKLalCYTeUpXps/TK5acgXD7urvgNXXfeLel2N0FdSUz8L/56ucAhfMhc89cMHEsmwavI7veIdnbLtJB0YMtAdmouEScF+cVvKqM7f87m1kQ5CV8ACpr+//Agj22oAJ4lBC0bWigBxAyvrsuwoSzlexWq7FmJ1UVvhdOG2HYTR7xOQvGkknR6BLDcCT0jHxDYqjR5m3/+UobsKxKp9DjG/EXVV7GBtiquJST/B6ZtRO5nLLwyPc4xdVeGxKc0OW6j7vpzmFsMpqVB+75P0LmJ9CkrdxvNyvhyAuGovcAdPBx57g8lUrGOFBFDT9YL6cvMFX2hbSmqFvwp+or7CygaB8CLwAdREwz6zJbOIxXMbrxVEQfXhIpffHo8080hDAXIdn3hqNDCW3Bsj9hSA+fjtHE0DTFEo+yLn2IO5dPUeHUfkM/0IlVpXNs1ZX35SZdcwvmx1mJROvRyXJP0=
+  on:
+    tags: true
