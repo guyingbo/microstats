@@ -109,7 +109,6 @@ class MicroStats:
             elif isinstance(v, list):
                 for postfix, val in get_stats(v).items():
                     result['%s_%s' % (k, postfix)] = val
-                # for python2
                 del v[:]
                 # for python3
                 # v.clear()
@@ -129,4 +128,6 @@ class StatsGroup:
         return self.stats[name]
 
     def flush(self):
-        return {k: v.flush() for k, v in self.stats.items()}
+        return dict((k, v.flush()) for k, v in self.stats.items())
+        # python3
+        # return {k: v.flush() for k, v in self.stats.items()}
