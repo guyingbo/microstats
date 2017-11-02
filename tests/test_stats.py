@@ -80,3 +80,12 @@ def test_micro_stats():
     assert data['ConcurrentRequest_min'] == 60
     assert data['Requests'] == 0
     assert data['User'] == 0
+
+
+def test_stats_group():
+    group = microstats.StatsGroup()
+    group.group1.incr('Click')
+    group.group2.incr('Conversion', 5)
+    data = group.flush()
+    assert data['group1']['Click'] == 1
+    assert data['group2']['Conversion'] == 5

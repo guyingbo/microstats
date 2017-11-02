@@ -1,7 +1,8 @@
 import math
 import time
+from collections import defaultdict
 from contextlib import contextmanager
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 
 class GaugeValue:
@@ -108,11 +109,24 @@ class MicroStats:
             elif isinstance(v, list):
                 for postfix, val in get_stats(v).items():
                     result['%s_%s' % (k, postfix)] = val
-                del v[:] # for python2
-                # v.clear() # for python3
+                # for python2
+                del v[:]
+                # for python3
+                # v.clear()
         return result
 
     def flush(self):
         data = self._flush()
         data.update(self.default)
         return data
+
+
+class StatsGroup:
+    def __init__(self, factory=lambda: MicroStats()):
+        self.stats = defaultdict(factory)
+
+    def __getattr__(self, name):
+        return self.stats[name]
+
+    def flush(self):
+        return {k: v.flush() for k, v in self.stats.items()}
