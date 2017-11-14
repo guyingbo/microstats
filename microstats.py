@@ -1,8 +1,8 @@
-import math
+# import math
 import time
 from collections import defaultdict
 from contextlib import contextmanager
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 
 class GaugeValue:
@@ -31,15 +31,16 @@ def get_stats(lst):
     total = sum(lst)
     length = len(lst)
     avg = total / length
-    p95 = int(math.ceil(length * 95.0 / 100)) - 1
-    p5 = length - p95 - 1
+    # p95 = int(math.ceil(length * 95.0 / 100)) - 1
+    # p5 = length - p95 - 1
     return {
         'sum': total,
         'avg': avg,
-        'max_p95': lst[p95],
-        'min_p95': lst[p5],
+        # 'max_p95': lst[p95],
+        # 'min_p95': lst[p5],
         'max': lst[-1],
         'min': lst[0],
+        'cnt': length,
     }
 
 
@@ -90,32 +91,51 @@ class MicroStats:
     def before_flush(self, stat, func):
         self.functions[stat] = func
 
-    def _flush(self):
+    def _interal_flush(self):
         result = {}
         for stat, func in self.functions.items():
             self.gauge(stat, func())
         for k, v in self.metrics.items():
             if isinstance(v, GaugeValue):
-                result[k] = v.val
-                result['%s_max' % k] = v.val_max
-                result['%s_min' % k] = v.val_min
+                result[k] = {
+                    k: v.val,
+                    '%s_max' % k: v.val_max,
+                    '%s_min' % k: v.val_min,
+                }
                 v.reset()
             elif isinstance(v, (int, float)):
                 result[k] = v
                 self.metrics[k] = 0
             elif isinstance(v, set):
-                result[k] = len(v)
+                result[k] = {k: len(v)}
                 v.clear()
             elif isinstance(v, list):
-                for postfix, val in get_stats(v).items():
-                    result['%s_%s' % (k, postfix)] = val
+                result[k] = dict(
+                    ('%s_%s' % (k, postfix), val)
+                    for postfix, val in get_stats(v).items()
+                )
                 del v[:]
                 # for python3
                 # v.clear()
         return result
 
-    def flush(self):
-        data = self._flush()
+    def _flush(self, statsd=None):
+        data = self._interal_flush()
+        mix_data = {}
+        for k, v in data.items():
+            if isinstance(v, dict):
+                for key, val in v.items():
+                    mix_data[key] = val
+                    if statsd:
+                        statsd.send_gauge(key, val)
+            else:
+                mix_data[k] = v
+                if statsd:
+                    statsd.incr(k, v)
+        return mix_data
+
+    def flush(self, statsd=None):
+        data = self._flush(statsd)
         data.update(self.default)
         return data
 
