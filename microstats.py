@@ -2,7 +2,7 @@
 import time
 from collections import defaultdict
 from contextlib import contextmanager
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 
 class GaugeValue:
@@ -119,23 +119,19 @@ class MicroStats:
                 # v.clear()
         return result
 
-    def _flush(self, statsd=None):
+    def _flush(self):
         data = self._interal_flush()
         mix_data = {}
         for k, v in data.items():
             if isinstance(v, dict):
                 for key, val in v.items():
                     mix_data[key] = val
-                    if statsd:
-                        statsd.send_gauge(key, val)
             else:
                 mix_data[k] = v
-                if statsd:
-                    statsd.incr(k, v)
         return mix_data
 
-    def flush(self, statsd=None):
-        data = self._flush(statsd)
+    def flush(self):
+        data = self._flush()
         data.update(self.default)
         return data
 
