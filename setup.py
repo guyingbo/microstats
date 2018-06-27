@@ -4,34 +4,40 @@ except ImportError:
     from distutils.core import setup
 import os.path
 import re
-VERSION_RE = re.compile(r'''__version__ = ['"]([0-9.]+)['"]''')
+
+VERSION_RE = re.compile(r"""__version__ = ['"]([0-9.]+)['"]""")
 BASE_PATH = os.path.dirname(__file__)
 
 
-with open(os.path.join(BASE_PATH, 'microstats.py')) as f:
+with open(os.path.join(BASE_PATH, "microstats.py")) as f:
     try:
         version = VERSION_RE.search(f.read()).group(1)
     except IndexError:
-        raise RuntimeError('Unable to determine version.')
+        raise RuntimeError("Unable to determine version.")
+
+
+with open(os.path.join(BASE_PATH, "README.md")) as readme:
+    long_description = readme.read()
 
 
 setup(
-    name='microstats',
-    description='A very simple in-memory statistics module.',
-    license='MIT',
+    name="microstats",
+    description="A very simple in-memory statistics module.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    license="MIT",
     version=version,
-    author='Yingbo Gu',
-    author_email='tensiongyb@gmail.com',
-    maintainer='Yingbo Gu',
-    maintainer_email='tensiongyb@gmail.com',
-    url='https://github.com/guyingbo/microstats',
-    py_modules=['microstats'],
-    python_requires='>=3.5',
+    author="Yingbo Gu",
+    author_email="tensiongyb@gmail.com",
+    maintainer="Yingbo Gu",
+    maintainer_email="tensiongyb@gmail.com",
+    url="https://github.com/guyingbo/microstats",
+    py_modules=["microstats"],
+    python_requires=">=3.5",
     classifiers=[
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3',
-        'Intended Audience :: Developers',
+        "Programming Language :: Python :: 3",
+        "Intended Audience :: Developers",
     ],
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest"],
 )

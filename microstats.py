@@ -2,14 +2,15 @@
 import time
 from collections import defaultdict
 from contextlib import contextmanager
-__version__ = '0.1.4'
+
+__version__ = "0.1.4"
 
 
 class GaugeValue:
     def __init__(self):
         self.val = 0
-        self.val_min = float('inf')
-        self.val_max = float('-inf')
+        self.val_min = float("inf")
+        self.val_max = float("-inf")
 
     def add(self, val):
         new_val = self.val + val
@@ -34,13 +35,13 @@ def get_stats(lst):
     # p95 = int(math.ceil(length * 95.0 / 100)) - 1
     # p5 = length - p95 - 1
     return {
-        'sum': total,
-        'avg': avg,
+        "sum": total,
+        "avg": avg,
         # 'max_p95': lst[p95],
         # 'min_p95': lst[p5],
-        'max': lst[-1],
-        'min': lst[0],
-        'cnt': length,
+        "max": lst[-1],
+        "min": lst[0],
+        "cnt": length,
     }
 
 
@@ -81,7 +82,7 @@ class MicroStats:
         start = time.time()
         yield
         end = time.time()
-        self.timing(stat, int((end-start) * 1000))
+        self.timing(stat, int((end - start) * 1000))
 
     def unique(self, stat, value):
         if stat not in self.metrics:
@@ -97,11 +98,7 @@ class MicroStats:
             self.gauge(stat, func())
         for k, v in self.metrics.items():
             if isinstance(v, GaugeValue):
-                result[k] = {
-                    k: v.val,
-                    '%s_max' % k: v.val_max,
-                    '%s_min' % k: v.val_min,
-                }
+                result[k] = {k: v.val, "%s_max" % k: v.val_max, "%s_min" % k: v.val_min}
                 v.reset()
             elif isinstance(v, (int, float)):
                 result[k] = v
@@ -111,7 +108,7 @@ class MicroStats:
                 v.clear()
             elif isinstance(v, list):
                 result[k] = dict(
-                    ('%s_%s' % (k, postfix), val)
+                    ("%s_%s" % (k, postfix), val)
                     for postfix, val in get_stats(v).items()
                 )
                 del v[:]
