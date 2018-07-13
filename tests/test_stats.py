@@ -24,8 +24,8 @@ def test_gauge_value():
 
 
 def test_get_stats():
-    l = [0]
-    d = microstats.get_stats(l)
+    list1 = [0]
+    d = microstats.get_stats(list1)
     assert d == {
         "sum": 0,
         "avg": 0,
@@ -50,10 +50,12 @@ def test_micro_stats():
     stats.flush()
     stats.incr("Requests", 50)
     stats.incr("Requests", 10)
+    stats.decr("Price", 10)
     stats.gauge("ConcurrentRequest", 36)
     stats.gauge("ConcurrentRequest", 21)
     stats.gauge("ConcurrentRequest", 15)
     stats.gauge("ConcurrentRequest", 41)
+    stats.gauge("ConcurrentRequest", 10, delta=True)
     with stats.timer("Latency"):
         time.sleep(0.008)
     with stats.timer("Latency"):
@@ -68,6 +70,7 @@ def test_micro_stats():
     data = stats.flush()
     print(data)
     assert data["Requests"] == 60
+    assert data["Price"] == -10
     assert data["ConcurrentRequest"] == 60
     assert data["ConcurrentRequest_max"] == 60
     assert data["ConcurrentRequest_min"] == 15

@@ -1,0 +1,7 @@
+[run]
+source = microstats
+
+[report]
+include =
+    microstats.py
+    tests/*.py

@@ -22,7 +22,7 @@ with open(os.path.join(BASE_PATH, "README.md")) as readme:
 
 setup(
     name="microstats",
-    description="A very simple in-memory statistics module.",
+    description="A very simple in-memory statistics module",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="MIT",
@@ -33,11 +33,13 @@ setup(
     maintainer_email="tensiongyb@gmail.com",
     url="https://github.com/guyingbo/microstats",
     py_modules=["microstats"],
-    python_requires=">=3.5",
+    python_requires=">=3.5,>=2.7",
     classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Intended Audience :: Developers",
     ],
     setup_requires=["pytest-runner"],
-    tests_require=["pytest"],
+    tests_require=["pytest", "coverage", "pytest-cov"],
 )
