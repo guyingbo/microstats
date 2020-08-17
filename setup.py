@@ -5,6 +5,8 @@ except ImportError:
 import os.path
 import re
 
+from Cython.Build import cythonize
+
 VERSION_RE = re.compile(r"""__version__ = ['"]([0-9.]+)['"]""")
 BASE_PATH = os.path.dirname(__file__)
 
@@ -33,10 +35,10 @@ setup(
     maintainer_email="tensiongyb@gmail.com",
     url="https://github.com/guyingbo/microstats",
     py_modules=["microstats"],
-    python_requires=">=3.5,>=2.7",
+    python_requires=">=3.5",
+    ext_modules=cythonize("microstats.py", language_level=3),
     classifiers=[
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Intended Audience :: Developers",
     ],

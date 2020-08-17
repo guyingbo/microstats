@@ -1,4 +1,5 @@
 import time
+
 import microstats
 
 lst = [7, 4, 8, 6, 3.6, 8, 3, 3, 5, 2, 23, 9, 20, 7, 28, 22, 22, 6, 7, 7]

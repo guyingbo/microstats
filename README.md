@@ -1,5 +1,6 @@
 # microstats
 
+![Python package](https://github.com/guyingbo/microstats/workflows/Python%20package/badge.svg)
 [![Build Status](https://travis-ci.org/guyingbo/microstats.svg?branch=master)](https://travis-ci.org/guyingbo/microstats)
 [![Python Version](https://img.shields.io/pypi/pyversions/microstats.svg)](https://pypi.python.org/pypi/microstats)
 [![Version](https://img.shields.io/pypi/v/microstats.svg)](https://pypi.python.org/pypi/microstats)

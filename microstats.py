@@ -2,8 +2,11 @@
 import time
 from collections import defaultdict
 from contextlib import contextmanager
+from typing import Callable, Dict, Generator, Hashable, Union
 
 __version__ = "0.1.4"
+
+Number = Union[int, float]
 
 
 class GaugeValue:
@@ -12,20 +15,20 @@ class GaugeValue:
         self.val_min = float("inf")
         self.val_max = float("-inf")
 
-    def add(self, val):
+    def add(self, val: Number) -> None:
         new_val = self.val + val
         self.set(new_val)
 
-    def set(self, val):
+    def set(self, val: Number) -> None:
         self.val_min = min(val, self.val_min)
         self.val_max = max(val, self.val_max)
         self.val = val
 
-    def reset(self):
+    def reset(self) -> None:
         self.val_max = self.val_min = self.val
 
 
-def get_stats(lst):
+def get_stats(lst: list) -> dict:
     if not lst:
         return {}
     lst.sort()
@@ -46,22 +49,22 @@ def get_stats(lst):
 
 
 class MicroStats:
-    def __init__(self, default=None):
+    def __init__(self, default: dict = None):
         self.default = default or {}
-        self.metrics = {}
-        self.functions = {}
+        self.metrics = {}  # type: ignore
+        self.functions: Dict[Hashable, Callable] = {}
 
-    def incr(self, stat, count=1, rate=1):
+    def incr(self, stat: Hashable, count: Number = 1, rate: Number = 1) -> None:
         if stat not in self.metrics:
             self.metrics[stat] = 0
         self.metrics[stat] += count / rate
 
-    def decr(self, stat, count=1, rate=1):
+    def decr(self, stat: Hashable, count: Number = 1, rate: Number = 1) -> None:
         if stat not in self.metrics:
             self.metrics[stat] = 0
         self.metrics[stat] -= count / rate
 
-    def gauge(self, stat, value, delta=False):
+    def gauge(self, stat: Hashable, value: Number, delta: bool = False) -> None:
         if stat not in self.metrics:
             self.metrics[stat] = GaugeValue()
         if delta:
@@ -69,31 +72,31 @@ class MicroStats:
         else:
             self.metrics[stat].set(value)
 
-    def scatter(self, stat, val):
+    def scatter(self, stat: Hashable, val: Number) -> None:
         if stat not in self.metrics:
             self.metrics[stat] = []
         self.metrics[stat].append(val)
 
-    def timing(self, stat, delta):
-        return self.scatter(stat, delta)
+    def timing(self, stat: Hashable, val: Number) -> None:
+        self.scatter(stat, val)
 
     @contextmanager
-    def timer(self, stat):
+    def timer(self, stat: Hashable) -> Generator[None, None, None]:
         start = time.time()
         yield
         end = time.time()
         self.timing(stat, int((end - start) * 1000))
 
-    def unique(self, stat, value):
+    def unique(self, stat: Hashable, val: Number) -> None:
         if stat not in self.metrics:
             self.metrics[stat] = set()
-        self.metrics[stat].add(value)
+        self.metrics[stat].add(val)
 
-    def before_flush(self, stat, func):
+    def before_flush(self, stat: Hashable, func: Callable) -> None:
         self.functions[stat] = func
 
-    def _interal_flush(self):
-        result = {}
+    def _interal_flush(self) -> dict:
+        result: Dict[Hashable, Dict[Hashable, Number]] = {}
         for stat, func in self.functions.items():
             self.gauge(stat, func())
         for k, v in self.metrics.items():
@@ -101,22 +104,20 @@ class MicroStats:
                 result[k] = {k: v.val, "%s_max" % k: v.val_max, "%s_min" % k: v.val_min}
                 v.reset()
             elif isinstance(v, (int, float)):
-                result[k] = v
+                result[k] = {k: v}
                 self.metrics[k] = 0
             elif isinstance(v, set):
                 result[k] = {k: len(v)}
                 v.clear()
             elif isinstance(v, list):
-                result[k] = dict(
-                    ("%s_%s" % (k, postfix), val)
+                result[k] = {
+                    "%s_%s" % (k, postfix): val
                     for postfix, val in get_stats(v).items()
-                )
-                del v[:]
-                # for python3
-                # v.clear()
+                }
+                v.clear()
         return result
 
-    def _flush(self):
+    def _flush(self) -> dict:
         data = self._interal_flush()
         mix_data = {}
         for k, v in data.items():
@@ -127,20 +128,18 @@ class MicroStats:
                 mix_data[k] = v
         return mix_data
 
-    def flush(self):
+    def flush(self) -> dict:
         data = self._flush()
         data.update(self.default)
         return data
 
 
 class StatsGroup:
-    def __init__(self, factory=lambda: MicroStats()):
-        self.stats = defaultdict(factory)
+    def __init__(self, factory: Callable = lambda: MicroStats()):
+        self.stats: defaultdict = defaultdict(factory)
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str):
         return self.stats[name]
 
-    def flush(self):
-        return dict((k, v.flush()) for k, v in self.stats.items())
-        # python3
-        # return {k: v.flush() for k, v in self.stats.items()}
+    def flush(self) -> dict:
+        return {k: v.flush() for k, v in self.stats.items()}
