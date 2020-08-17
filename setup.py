@@ -35,7 +35,7 @@ setup(
     maintainer_email="tensiongyb@gmail.com",
     url="https://github.com/guyingbo/microstats",
     py_modules=["microstats"],
-    python_requires=">=3.5",
+    python_requires=">=3.6",
     ext_modules=cythonize("microstats.py", language_level=3),
     classifiers=[
         "License :: OSI Approved :: MIT License",

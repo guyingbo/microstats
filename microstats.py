@@ -49,12 +49,10 @@ def get_stats(lst: list) -> dict:
 
 
 class MicroStats:
-    functions: Dict[Hashable, Callable]
-
     def __init__(self, default: dict = None):
         self.default = default or {}
         self.metrics = {}  # type: ignore
-        self.functions = {}
+        self.functions: Dict[Hashable, Callable] = {}
 
     def incr(self, stat: Hashable, count: Number = 1, rate: Number = 1) -> None:
         if stat not in self.metrics:
@@ -98,7 +96,7 @@ class MicroStats:
         self.functions[stat] = func
 
     def _interal_flush(self) -> dict:
-        result = {}  # type: Dict[Hashable, Dict[Hashable, Number]]
+        result: Dict[Hashable, Dict[Hashable, Number]] = {}
         for stat, func in self.functions.items():
             self.gauge(stat, func())
         for k, v in self.metrics.items():
